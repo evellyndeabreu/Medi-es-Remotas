@@ -1,0 +1,58 @@
+#include "DHT.h"
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <SoftwareSerial.h> // Inclua a biblioteca SoftwareSerial
+
+
+// Pino do sensor DS18B20
+#define ONE_WIRE_BUS 2
+
+
+// Instancia para se comunicar com o sensor
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+
+
+// Pinos do Bluetooth
+#define BT_TX 10 // TX do Bluetooth conectado ao RX do Arduino
+#define BT_RX 11 // RX do Bluetooth conectado ao TX do Arduino
+
+
+SoftwareSerial BTSerial(BT_RX, BT_TX); // RX, TX
+
+
+void setup() {
+ // Inicializa comunicação serial para monitor e Bluetooth
+ Serial.begin(9600);
+ BTSerial.begin(9600); // Comunicação com o HC-05
+ 
+ Serial.println("Iniciando...");
+
+
+ // Inicia o sensor de temperatura DS18B20
+ sensors.begin();
+}
+
+
+void loop() {
+ // Solicita leitura da temperatura
+ sensors.requestTemperatures();
+ 
+ // Lê a temperatura em Celsius
+ float tempC = sensors.getTempCByIndex(0);
+
+
+ // Mostra a temperatura no monitor serial
+ Serial.print("Temperatura: ");
+ Serial.print(tempC);
+ Serial.println(" ºC");
+
+
+ // Você pode enviar a temperatura via Bluetooth, se necessário
+ BTSerial.print("Temperatura: ");
+ BTSerial.print(tempC);
+ BTSerial.println(" ºC");
+
+
+ delay(2000); // Adiciona um atraso para não sobrecarregar a saída
+}
